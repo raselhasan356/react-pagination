@@ -1,7 +1,8 @@
+import PaginatedTable from "./components/PaginatedTable";
 function App() {
   return (
     <>
-      <h1>Nothing</h1>
+      <PaginatedTable />
     </>
   );
 }
