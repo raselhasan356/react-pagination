@@ -36,7 +36,7 @@ export default function Paginate({
   return (
     <div className="flex overflow-auto space-x-4 m-2 rounded-md p-2 items-center justify-center">
       <button
-        className="shadow-md bg-slate-100 rounded-md p-1 w-22"
+        className="shadow-md bg-slate-100 rounded-md p-1 px-2"
         onClick={() => gotoPage(0)}
         disabled={!canGotoPreviousPage}
       >
@@ -44,7 +44,7 @@ export default function Paginate({
       </button>
 
       <button
-        className="shadow-md bg-slate-100 rounded-md p-1 w-20"
+        className="shadow-md bg-slate-100 rounded-md p-1 px-2"
         onClick={() => previousPage()}
         disabled={!canGotoPreviousPage}
       >
@@ -52,7 +52,7 @@ export default function Paginate({
       </button>
 
       <button
-        className="shadow-md bg-slate-100 rounded-md p-1 w-20"
+        className="shadow-md bg-slate-100 rounded-md p-1 px-2"
         onClick={() => nextPage()}
         disabled={!canGotoNextPage}
       >
@@ -60,7 +60,7 @@ export default function Paginate({
       </button>
 
       <button
-        className="shadow-md bg-slate-100 rounded-md p-1 w-20"
+        className="shadow-md bg-slate-100 rounded-md p-1 px-2"
         onClick={() => gotoPage(pageCount - 1)}
         disabled={!canGotoNextPage}
       >
@@ -87,7 +87,7 @@ export default function Paginate({
         />
       </span>
       <select
-        className="w-25 shadow-md rounded-md p-1"
+        className="w-25 shadow-md rounded-md p-1 px-2"
         value={pageSize}
         onChange={(e) => {
           onSetPageSize(Number(e.target.value));

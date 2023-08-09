@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { headers, isNeeded } from "../utils/tableProperties";
 import Paginate from "./Paginate";
-export default function PaginatedTable() {
+
+export default function Launches() {
   const [data, setData] = useState([]);
   const [currentData, setCurrentData] = useState([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
