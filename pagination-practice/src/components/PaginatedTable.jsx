@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { headers, isNeeded } from "../utils/tableProperties";
+import Paginate from "./Paginate";
 export default function PaginatedTable() {
   const [data, setData] = useState([]);
   const [currentData, setCurrentData] = useState([]);
   const [currentPageIndex, setCurrentPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-
-  const pageCount = Math.ceil(data.length / pageSize);
 
   const indexOfFirstItem = pageSize * currentPageIndex;
   const indexOfLastItem = Math.min(
@@ -14,43 +14,13 @@ export default function PaginatedTable() {
     data.length - 1
   );
 
-  function gotoPage(pageIndex) {
-    if (pageIndex >= 0 && pageIndex < pageCount) {
-      setCurrentPageIndex(pageIndex);
-    }
-  }
-
-  function canGotoPreviousPage() {
-    if (currentPageIndex > 0) {
-      return true;
-    }
-    return false;
-  }
-
-  function canGotoNextPage() {
-    console.log("PageCount", pageCount);
-    if (currentPageIndex < pageCount - 1) {
-      return true;
-    }
-    return false;
-  }
-
-  function previousPage() {
-    if (canGotoPreviousPage()) {
-      setCurrentPageIndex(currentPageIndex - 1);
-    }
-  }
-
-  function nextPage() {
-    if (canGotoNextPage()) {
-      setCurrentPageIndex(currentPageIndex + 1);
-    }
-  }
-
   useEffect(() => {
-    axios.get("https://api.spacexdata.com/v5/launches").then((res) => {
-      setData(res.data);
-    });
+    axios
+      .get(`${import.meta.env.VITE_REACT_APP_BASE_API_ENDPOINT}/v5/launches`)
+      .then((res) => {
+        //console.log(res.data);
+        setData(res.data);
+      });
   }, []);
 
   useEffect(() => {
@@ -61,9 +31,7 @@ export default function PaginatedTable() {
     );
   }, [data, indexOfFirstItem, indexOfLastItem]);
 
-  const headers = ["ID", "Name", "Flight Number", "Date", "Success status"];
-
-  function renderTableHeader() {
+  function renderHeaders(headers) {
     return (
       <thead className="text-lg text-gray-900 bg-gray-200">
         <tr>
@@ -77,19 +45,27 @@ export default function PaginatedTable() {
     );
   }
 
-  function renderTableData() {
-    //console.log(currentData);
+  function renderTd(item) {
+    return Object.keys(item).map(
+      (key, i) =>
+        isNeeded(key) && (
+          <td key={i} className="px-6 py-2">
+            {item[key]}
+          </td>
+        )
+    );
+  }
+
+  function renderRows(tableData) {
     return (
       <tbody>
-        {currentData.map((item) => (
-          <tr className="bg-white border-b" key={item.id}>
-            <td className="px-6 py-2">{item.id}</td>
-            <td className="px-6 py-2">{item.name}</td>
-            <td className="px-6 py-2">{item.flight_number}</td>
-            <td className="px-6 py-2">{item.date_local}</td>
-            <td className="px-6 py-2">{item.success ? "Success" : "Failed"}</td>
-          </tr>
-        ))}
+        {tableData.map((item) => {
+          return (
+            <tr className="bg-white border-b" key={item.id}>
+              {renderTd(item)}
+            </tr>
+          );
+        })}
       </tbody>
     );
   }
@@ -97,8 +73,8 @@ export default function PaginatedTable() {
   function renderTable() {
     return (
       <table className="w-full shadow-md text-sm text-left text-gray-900 rounded-md">
-        {renderTableHeader()}
-        {renderTableData()}
+        {renderHeaders(headers)}
+        {renderRows(currentData)}
       </table>
     );
   }
@@ -108,75 +84,13 @@ export default function PaginatedTable() {
       <div className="flex relative overflow-x-auto p-2 items-center justify-center">
         {renderTable()}
       </div>
-      <div className="flex relative overflow-auto space-x-4 m-2 rounded-md p-2 items-center justify-center">
-        <button
-          className="shadow-md bg-slate-100 rounded-md p-1 w-22"
-          onClick={() => gotoPage(0)}
-          disabled={!canGotoPreviousPage}
-        >
-          {"First Page"}
-        </button>
-
-        <button
-          className="shadow-md bg-slate-100 rounded-md p-1 w-20"
-          onClick={() => previousPage()}
-          disabled={!canGotoPreviousPage}
-        >
-          Previous
-        </button>
-
-        <button
-          className="shadow-md bg-slate-100 rounded-md p-1 w-20"
-          onClick={() => nextPage()}
-          disabled={!canGotoNextPage}
-        >
-          Next
-        </button>
-
-        <button
-          className="shadow-md bg-slate-100 rounded-md p-1 w-20"
-          onClick={() => gotoPage(pageCount - 1)}
-          disabled={!canGotoNextPage}
-        >
-          {"Last Page"}
-        </button>
-
-        <span>
-          Page{" "}
-          <strong>
-            {currentPageIndex + 1} of {pageCount}
-          </strong>
-        </span>
-
-        <span>
-          Goto page:{" "}
-          <input
-            className="w-12 shadow-md p-1 rounded-md"
-            type="number"
-            defaultValue={currentPageIndex + 1}
-            onChange={(e) => {
-              const pageNumber = e.target.value
-                ? Number(e.target.value) - 1
-                : 0;
-              gotoPage(pageNumber);
-            }}
-          />
-        </span>
-        <select
-          className="w-25 shadow-md rounded-md p-1"
-          value={pageSize}
-          onChange={(e) => {
-            setPageSize(Number(e.target.value));
-            setCurrentPageIndex(0);
-          }}
-        >
-          {[10, 25, 50].map((pageSize) => (
-            <option key={pageSize} value={pageSize}>
-              Show {pageSize}
-            </option>
-          ))}
-        </select>
-      </div>
+      <Paginate
+        data={data}
+        pageSize={pageSize}
+        onSetPageSize={setPageSize}
+        currentPageIndex={currentPageIndex}
+        onSetCurrentPageIndex={setCurrentPageIndex}
+      />
     </div>
   );
 }
