@@ -1,15 +1,14 @@
 export default function Paginate({
   data,
+  totalPages,
   pageSize,
   onSetPageSize,
   currentPageIndex,
   onSetCurrentPageIndex,
 }) {
-  const pageCount = Math.ceil(data.length / pageSize);
-
-  function gotoPage(pageIndex) {
-    if (pageIndex >= 0 && pageIndex < pageCount) {
-      onSetCurrentPageIndex(pageIndex);
+  function gotoPage(nextPageIndex) {
+    if (nextPageIndex >= 0 && nextPageIndex < totalPages) {
+      onSetCurrentPageIndex(nextPageIndex);
     }
   }
 
@@ -18,7 +17,7 @@ export default function Paginate({
   }
 
   function canGotoNextPage() {
-    return currentPageIndex < pageCount - 1;
+    return currentPageIndex < totalPages - 1;
   }
 
   function previousPage() {
@@ -61,7 +60,7 @@ export default function Paginate({
 
       <button
         className="shadow-md bg-slate-100 rounded-md p-1 px-2"
-        onClick={() => gotoPage(pageCount - 1)}
+        onClick={() => gotoPage(totalPages - 1)}
         disabled={!canGotoNextPage}
       >
         {"Last Page"}
@@ -70,7 +69,7 @@ export default function Paginate({
       <span>
         Page{" "}
         <strong>
-          {currentPageIndex + 1} of {pageCount}
+          {currentPageIndex + 1} of {totalPages}
         </strong>
       </span>
 
